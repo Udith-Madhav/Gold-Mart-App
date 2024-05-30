@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "533006065088",
+    "project_id": "goldmart-1e92c",
+    "storage_bucket": "goldmart-1e92c.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:533006065088:android:f1308b71d1b281aabfbc25",
+        "android_client_info": {
+          "package_name": "com.example.gold_mart"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBgAU_mZVACupVRb48zLYc1WLMny6DBvPM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
