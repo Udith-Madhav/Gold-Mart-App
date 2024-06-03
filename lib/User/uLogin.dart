@@ -25,171 +25,54 @@ class _UserLoginState extends State<UserLogin> {
     double screenWidth = MediaQuery.of(context).size.width;
     double screenHeight = MediaQuery.of(context).size.height;
     return Scaffold(
-      body:SingleChildScrollView(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-        
-            
-                
-            Stack(
-              children: [
-                 Container(
-                  width: screenWidth,
-                  height: screenHeight,
-                  child: Image.asset('assets/ulogin.jpeg',fit: BoxFit.fill,),
-                ),
+      body: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Stack(
+            children: [
+              Container(
+                width: screenWidth,
+                height: screenHeight,
+                child: Image.asset('assets/main.jpeg',fit: BoxFit.fill,),
+              ),
 
-                Text(
-                  'Login',
-                  style: TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.w400,
-                    fontFamily: 'Lexend',
-                    color: Colors.white
-                  ),
+              Padding(
+                padding: const EdgeInsets.only(top: 400),
+                child: Center(
+                  child: Text("Login with Google",style: TextStyle(color: Colors.white),)
                 ),
-            
-                Positioned(
-                  bottom: 200,
-                  left: 80,
-                  child: Center(
-                    child: Form(
-                      key: _formKey,
-                      child: Container(
-                        width: screenWidth-150,
-                        height: screenHeight/2.8,
-                        // decoration: BoxDecoration(
-                        //   border: Border.all()
-                        // ),
-                              
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                              
-                            TextFormField(
-                              textAlign: TextAlign.center,
-                              style: TextStyle(fontSize: 25),
-                              decoration: InputDecoration(
-                                border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(40),
-                                ),
-                                fillColor: Colors.white,
-                                filled: true,
-                                hintText: 'Enter your Email'
-                              ),
-                              
-                              controller: _emailcontroller,
-                              validator: (value) {
-                                if(value!.isEmpty){
-                                  return 'Email cannot be empty';
-                                }
-                                else if(!EmailValidator.validate(value,true)){
-                                  return 'Inavlid Email Address';
-                                }
-                                else{
-                                  return null;
-                                }
-                              },
+              ),
+
+              Padding(
+                padding: const EdgeInsets.only(top: 430),
+                child: Center(
+                  child: SizedBox(
+                    width: screenWidth-150,
+                    child: ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.yellow.withOpacity(.80),
+                        foregroundColor: Colors.black
+                      ),
+                      onPressed: () {
+                        Navigator.push(context, MaterialPageRoute(builder: (context) => Udetails()));
+                      }, 
+                      child: Text('Login',
+                      style: TextStyle(
+                              color: Colors.black,
+                              fontFamily: 'Lexend',
+                              fontSize: 18,
+                              fontWeight: FontWeight.w800
                             ),
-                              
-                            // SizedBox(height: 5,),
-                              
-                            TextFormField(
-                              textAlign: TextAlign.center,
-                              decoration: InputDecoration(
-                                border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(40),
-                                ),
-                                fillColor: Colors.white,
-                                filled: true,
-                                hintText: 'Password'
-                              ),
-                              
-                              controller: _passwordcontroller,
-                              validator: (value) {
-                                if(value!.isEmpty){
-                                  return 'Password cannot be emplty';
-                                }
-                                else if(value.length < 8){
-                                  return 'Password should contain alteast 8 characters';
-                                }
-                                else{
-                                  return null;
-                                }
-                              },
-                            ),
-                              
-                            TextButton(
-                              onPressed: () {}, 
-                              child: Text(
-                                'Forgot Password?',
-                                style: TextStyle(
-                                  fontFamily: 'Lexend',
-                                  fontSize: 15,
-                                  color: Colors.white,
-                                  decoration: TextDecoration.underline,
-                                  decorationColor: Colors.white,
-                                  fontWeight: FontWeight.w400,
-                                ),
-                              ) 
-                            ),
-                              
-                            ElevatedButton(
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: Color(0xFFFACD18)
-                              ),
-                              onPressed: () async{
-                                if(_formKey.currentState!.validate()){
-                                  Fluttertoast.showToast(
-                                    msg: "Login Successful",
-                                    toastLength: Toast.LENGTH_LONG,
-                                    gravity: ToastGravity.CENTER,
-                                    timeInSecForIosWeb: 1,
-                                    backgroundColor: Colors.red,
-                                    textColor: Colors.white,
-                                    fontSize: 16.0
-                                );
-                                  
-                                  Navigator.push(context, MaterialPageRoute(builder: (context) => Udetails()));
-                                }
-                              }, 
-                              child: Text(
-                                'Login',
-                                style: TextStyle(
-                                  fontFamily: 'Lexend',
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.black,
-                                ),
-                              ) 
-                            )
-                          ],
-                        ),
-                      ) 
+                      )
                     ),
                   ),
                 ),
-            
-                Positioned(
-                  left: 170,
-                  top: 205,
-                  child: Text(
-                    'Start to save everyday.',
-                    style: TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w400,
-                      fontFamily: 'Lexend',
-                      color: Colors.white
-                    ),
-                  ),
-                ),
-            
-                
-              ],
-            ),
-          ],
-        ),
-      )
+              )
+            ],
+          )
+        ],
+      ),
     );
   }
 }

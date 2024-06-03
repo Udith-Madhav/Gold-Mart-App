@@ -1,4 +1,4 @@
-// ignore_for_file: prefer_final_fields, unused_element, sized_box_for_whitespace
+// ignore_for_file: prefer_final_fields, unused_element, sized_box_for_whitespace, prefer_const_constructors
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:email_validator/email_validator.dart';
@@ -44,9 +44,8 @@ class _JLoginState extends State<JLogin> {
                   child: Image.asset('assets/ulogin.jpeg',fit: BoxFit.fill,),
                 ),
             
-                Positioned(
-                  bottom: 200,
-                  left: screenWidth/12,
+                Padding(
+                  padding: const EdgeInsets.only(top: 350),
                   child: Center(
                     child: Form(
                       key: _formKey,
@@ -133,7 +132,7 @@ class _JLoginState extends State<JLogin> {
                                     ),
                                   ) 
                                 ),
-
+                  
                                 TextButton(
                                   onPressed: () {}, 
                                   child: Text(
@@ -159,13 +158,13 @@ class _JLoginState extends State<JLogin> {
                                 if(_formKey.currentState!.validate()){
                                   String email = _emailcontroller.text.trim();
                                   String password = _passwordcontroller.text.trim();
-
+                  
                                   var querySnapshot = await FirebaseFirestore.instance
                                   .collection('jregister')
                                   .where('email', isEqualTo: email)
                                   .limit(1)
                                   .get();
-
+                  
                                   if(querySnapshot.docs.isNotEmpty){
                                     var userData = querySnapshot.docs.first.data();
                                     var passwordFromDB = userData['password'] as String?;
@@ -175,7 +174,7 @@ class _JLoginState extends State<JLogin> {
                                         await _saveStoreId(storeId);
                                       }
                                       Navigator.push(context, MaterialPageRoute(builder: (context) => StockPage()));
-
+                  
                                       Fluttertoast.showToast(
                                         msg: 'Succesfully loggined',
                                         toastLength: Toast.LENGTH_LONG,
@@ -229,30 +228,32 @@ class _JLoginState extends State<JLogin> {
                   ),
                 ),
             
-                Positioned(
-                  left: 125,
-                  top: 205,
-                  child: Text(
-                    'Start to save everyday.',
-                    style: TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w400,
-                      fontFamily: 'Lexend',
-                      color: Colors.white
+                Padding(
+                  padding: const EdgeInsets.only(top: 200.0),
+                  child: Center(
+                    child: Text(
+                      'Start to save everyday.',
+                      style: TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w400,
+                        fontFamily: 'Lexend',
+                        color: Colors.white
+                      ),
                     ),
                   ),
                 ),
             
-                Positioned(
-                  left: 180,
-                  top: 170,
-                  child: Text(
-                    'Login',
-                    style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.w400,
-                      fontFamily: 'Lexend',
-                      color: Colors.white
+                Padding(
+                  padding: const EdgeInsets.only(top:170),
+                  child: Center(
+                    child: Text(
+                      'Login',
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.w400,
+                        fontFamily: 'Lexend',
+                        color: Colors.white
+                      ),
                     ),
                   ),
                 )
