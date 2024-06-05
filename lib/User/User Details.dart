@@ -1,8 +1,16 @@
-// ignore_for_file: prefer_const_constructors, sized_box_for_whitespace, unnecessary_null_comparison
+// ignore_for_file: prefer_const_constructors, sized_box_for_whitespace, unnecessary_null_comparison, unused_import, unused_field, use_super_parameters, avoid_print
 
+import 'dart:async';
 import 'dart:io';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+import 'package:gold_mart/User/User%20Home%20Button.dart';
+import 'package:gold_mart/User/User%20Home.dart';
 import 'package:gold_mart/User/uLogin.dart';
 import 'package:image_picker/image_picker.dart';
 
@@ -17,6 +25,118 @@ class Udetails extends StatefulWidget {
 
 class _UdetailsState extends State<Udetails> {
   Category? _categoryItem = Category.male;
+  final _formKey = GlobalKey<FormState>();
+
+  TextEditingController email = TextEditingController();
+  TextEditingController name = TextEditingController();
+  TextEditingController number = TextEditingController();
+  TextEditingController age = TextEditingController();
+  TextEditingController gender = TextEditingController();
+  TextEditingController password = TextEditingController();
+
+  Future<void> userAdding() async{
+    if(_formKey.currentState!.validate() && image!=null){
+      // if (image == null) {
+      //   Fluttertoast.showToast(
+      //     msg: 'Please upload a valid ID proof',
+      //     toastLength: Toast.LENGTH_LONG,
+      //     gravity: ToastGravity.BOTTOM,
+      //     timeInSecForIosWeb: 1,
+      //     backgroundColor: Colors.red,
+      //     textColor: Colors.white,
+      //     fontSize: 16.0,
+      //   );
+      //   return;
+      // }
+
+      try{
+
+        final ref = FirebaseStorage.instance
+        .ref()
+        .child('Photo_add')
+        .child(DateTime.now().microsecondsSinceEpoch.toString());
+        await ref.putFile(image!);
+        final imageurl = await ref.getDownloadURL();
+        
+        UserCredential userCredential =
+          await FirebaseAuth.instance.createUserWithEmailAndPassword(
+            email: email.text, 
+            password: password.text
+          );
+
+          String uid = userCredential.user!.uid;
+
+          // Upload image to Firebase Storage
+          // String imageUrl = await uploadImage(uid);
+
+          await FirebaseFirestore.instance.collection('userRegister').doc(uid).set(
+           {
+             'uemail' : email.text,
+             'uname' : name.text,
+             'uphone' : number.text,
+             'uage' : age.text,
+             'ugender' : _categoryItem.toString().split('.').last,
+            //  'uimage' : imageUrl,
+             'upassword' : password.text,
+             'userID' : uid,
+           }
+          );
+
+          Fluttertoast.showToast(
+              msg: 'User Registration Successfully Completed',
+              toastLength: Toast.LENGTH_LONG,
+              gravity: ToastGravity.BOTTOM,
+              timeInSecForIosWeb: 1,
+              backgroundColor: Colors.yellow,
+              textColor: Colors.black,
+              fontSize: 16.0,
+            );
+
+            Navigator.push(context, MaterialPageRoute(builder: (context) => UserLogin()));
+      }on FirebaseAuthException catch(e){
+        print('Failed to register user: $e');
+
+        String errorMessage = 'An error occurred';
+        if (e.code == 'email-already-in-use') {
+          errorMessage = 'Email is already in use';
+        }
+
+        Fluttertoast.showToast(
+          msg: errorMessage,
+          toastLength: Toast.LENGTH_LONG,
+          gravity: ToastGravity.BOTTOM,
+          timeInSecForIosWeb: 1,
+          backgroundColor: Colors.yellow,
+          textColor: Colors.black,
+          fontSize: 16.0,
+        );
+      }
+      catch(e){
+        print('Unexpected error during registration:$e');
+
+        Fluttertoast.showToast(
+          msg: 'Unexpected error during registration',
+          toastLength: Toast.LENGTH_LONG,
+          gravity: ToastGravity.BOTTOM,
+          timeInSecForIosWeb: 1,
+          backgroundColor: Colors.red,
+          textColor: Colors.white,
+          fontSize: 16.0,
+        );
+      }
+    }
+  }
+
+  // Future<String> uploadImage(String uid) async {
+  //   final storageRef = FirebaseStorage.instance.ref().child('user_images/$uid');
+  //   final uploadTask = storageRef.putFile(image!);
+  //   final snapshot = await uploadTask;
+  //   return await snapshot.ref.getDownloadURL();
+  // }
+
+  // Future<void> photoAdd() async{
+  //   if(image!=null){}
+  // }
 
   File? image;
   XFile? pick;
@@ -33,7 +153,7 @@ class _UdetailsState extends State<Udetails> {
               children: [
                 Container(
                   width: screenWidth,
-                  height: screenHeight + 300,
+                  height: screenHeight + 600,
                   child: Image.asset(
                     'assets/udetails.jpeg',
                     fit: BoxFit.fill,
@@ -41,9 +161,10 @@ class _UdetailsState extends State<Udetails> {
                 ),
                 Center(
                   child: Form(
+                    key: _formKey,
                     child: Container(
                       width: screenWidth - 50,
-                      height: screenHeight + 150,
+                      height: screenHeight + 550,
                       // decoration: BoxDecoration(border: Border.all()),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -64,6 +185,32 @@ class _UdetailsState extends State<Udetails> {
                           ),
                           SizedBox(height: 20),
                           Text(
+                            'What is your email?',
+                            style: TextStyle(
+                                fontSize: 20,
+                                fontWeight: FontWeight.w400,
+                                color: Colors.white),
+                          ),
+                          SizedBox(height: 10),
+                          TextFormField(
+                            controller: email,
+                            validator: (value) {
+                              if(value!.isEmpty){
+                                return 'cannot be empty';
+                              }
+                              return null;
+                            },
+                            style: TextStyle(fontSize: 15),
+                            decoration: InputDecoration(
+                                border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(20)),
+                                fillColor: Colors.white,
+                                filled: true,
+                                hintText: 'Enter your email'),
+                          ),
+                          SizedBox(height: 25),
+
+                          Text(
                             'What is your name?',
                             style: TextStyle(
                                 fontSize: 20,
@@ -72,6 +219,13 @@ class _UdetailsState extends State<Udetails> {
                           ),
                           SizedBox(height: 10),
                           TextFormField(
+                            controller: name,
+                            validator: (value) {
+                              if(value!.isEmpty){
+                                return 'cannot be empty';
+                              }
+                              return null;
+                            },
                             style: TextStyle(fontSize: 15),
                             decoration: InputDecoration(
                                 border: OutlineInputBorder(
@@ -81,6 +235,33 @@ class _UdetailsState extends State<Udetails> {
                                 hintText: 'Enter your name'),
                           ),
                           SizedBox(height: 25),
+
+                          Text(
+                            'Your phone number?',
+                            style: TextStyle(
+                                fontSize: 20,
+                                fontWeight: FontWeight.w400,
+                                color: Colors.white),
+                          ),
+                          SizedBox(height: 10),
+                          TextFormField(
+                            controller: number,
+                            validator: (value) {
+                              if(value!.isEmpty){
+                                return 'cannot be empty';
+                              }
+                              return null;
+                            },
+                            style: TextStyle(fontSize: 15),
+                            decoration: InputDecoration(
+                                border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(20)),
+                                fillColor: Colors.white,
+                                filled: true,
+                                hintText: 'Enter your phone number'),
+                          ),
+                          SizedBox(height: 25),
+
                           Text(
                             'What is your age?',
                             style: TextStyle(
@@ -90,6 +271,13 @@ class _UdetailsState extends State<Udetails> {
                           ),
                           SizedBox(height: 10),
                           TextFormField(
+                            controller: age,
+                            validator: (value) {
+                              if(value!.isEmpty){
+                                return 'cannot be empty';
+                              }
+                              return null;
+                            },
                             style: TextStyle(fontSize: 15),
                             decoration: InputDecoration(
                                 border: OutlineInputBorder(
@@ -221,6 +409,35 @@ class _UdetailsState extends State<Udetails> {
                               )
                             ],
                           ),
+
+                          SizedBox(height: 25,),
+
+                          Text(
+                            'Enter a password?',
+                            style: TextStyle(
+                                fontSize: 20,
+                                fontWeight: FontWeight.w400,
+                                color: Colors.white),
+                          ),
+                          SizedBox(height: 10),
+                          TextFormField(
+                            controller: password,
+                            validator: (value) {
+                              if(value!.isEmpty){
+                                return 'cannot be empty';
+                              }
+                              return null;
+                            },
+                            style: TextStyle(fontSize: 15),
+                            decoration: InputDecoration(
+                                border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(20)),
+                                fillColor: Colors.white,
+                                filled: true,
+                                hintText: 'Password'),
+                          ),
+                          SizedBox(height: 25),
+
                           SizedBox(
                             height: 60,
                           ),
@@ -229,7 +446,9 @@ class _UdetailsState extends State<Udetails> {
                                 style: ElevatedButton.styleFrom(
                                   backgroundColor: Color(0xFFFACD18),
                                 ),
-                                onPressed: () async {},
+                                onPressed: () async {
+                                  userAdding();
+                                },
                                 child: Text(
                                   'Submit',
                                   style: TextStyle(
