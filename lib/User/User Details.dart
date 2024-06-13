@@ -1,4 +1,4 @@
-// ignore_for_file: prefer_const_constructors, sized_box_for_whitespace, unnecessary_null_comparison, unused_import, unused_field, use_super_parameters, avoid_print
+// ignore_for_file: prefer_const_constructors, sized_box_for_whitespace, unnecessary_null_comparison, unused_import, unused_field, use_super_parameters, avoid_print, unnecessary_import
 
 import 'dart:async';
 import 'dart:io';
@@ -31,69 +31,53 @@ class _UdetailsState extends State<Udetails> {
   TextEditingController name = TextEditingController();
   TextEditingController number = TextEditingController();
   TextEditingController age = TextEditingController();
-  TextEditingController gender = TextEditingController();
   TextEditingController password = TextEditingController();
 
-  Future<void> userAdding() async{
-    if(_formKey.currentState!.validate() && image!=null){
-      // if (image == null) {
-      //   Fluttertoast.showToast(
-      //     msg: 'Please upload a valid ID proof',
-      //     toastLength: Toast.LENGTH_LONG,
-      //     gravity: ToastGravity.BOTTOM,
-      //     timeInSecForIosWeb: 1,
-      //     backgroundColor: Colors.red,
-      //     textColor: Colors.white,
-      //     fontSize: 16.0,
-      //   );
-      //   return;
-      // }
+  bool _isLoading = false; // Add this line
 
-      try{
+  Future<void> userAdding() async {
+    if (_formKey.currentState!.validate() && image != null) {
+      setState(() {
+        _isLoading = true; // Show the progress indicator
+      });
 
+      try {
         final ref = FirebaseStorage.instance
-        .ref()
-        .child('Photo_add')
-        .child(DateTime.now().microsecondsSinceEpoch.toString());
+            .ref()
+            .child('Photo_add')
+            .child(DateTime.now().microsecondsSinceEpoch.toString());
         await ref.putFile(image!);
         final imageurl = await ref.getDownloadURL();
-        
-        UserCredential userCredential =
-          await FirebaseAuth.instance.createUserWithEmailAndPassword(
-            email: email.text, 
-            password: password.text
-          );
 
-          String uid = userCredential.user!.uid;
+        UserCredential userCredential = await FirebaseAuth.instance
+            .createUserWithEmailAndPassword(
+                email: email.text, password: password.text);
 
-          // Upload image to Firebase Storage
-          // String imageUrl = await uploadImage(uid);
+        String uid = userCredential.user!.uid;
 
-          await FirebaseFirestore.instance.collection('userRegister').doc(uid).set(
-           {
-             'uemail' : email.text,
-             'uname' : name.text,
-             'uphone' : number.text,
-             'uage' : age.text,
-             'ugender' : _categoryItem.toString().split('.').last,
-            //  'uimage' : imageUrl,
-             'upassword' : password.text,
-             'userID' : uid,
-           }
-          );
+        await FirebaseFirestore.instance.collection('userRegister').doc(uid).set({
+          'uemail': email.text,
+          'uname': name.text,
+          'uphone': number.text,
+          'uage': age.text,
+          'ugender': _categoryItem.toString().split('.').last,
+          'upassword': password.text,
+          'userID': uid,
+        });
 
-          Fluttertoast.showToast(
-              msg: 'User Registration Successfully Completed',
-              toastLength: Toast.LENGTH_LONG,
-              gravity: ToastGravity.BOTTOM,
-              timeInSecForIosWeb: 1,
-              backgroundColor: Colors.yellow,
-              textColor: Colors.black,
-              fontSize: 16.0,
-            );
+        Fluttertoast.showToast(
+          msg: 'User Registration Successfully Completed',
+          toastLength: Toast.LENGTH_LONG,
+          gravity: ToastGravity.BOTTOM,
+          timeInSecForIosWeb: 1,
+          backgroundColor: Colors.yellow,
+          textColor: Colors.black,
+          fontSize: 16.0,
+        );
 
-            Navigator.push(context, MaterialPageRoute(builder: (context) => UserLogin()));
-      }on FirebaseAuthException catch(e){
+        Navigator.push(
+            context, MaterialPageRoute(builder: (context) => UserLogin()));
+      } on FirebaseAuthException catch (e) {
         print('Failed to register user: $e');
 
         String errorMessage = 'An error occurred';
@@ -110,8 +94,7 @@ class _UdetailsState extends State<Udetails> {
           textColor: Colors.black,
           fontSize: 16.0,
         );
-      }
-      catch(e){
+      } catch (e) {
         print('Unexpected error during registration:$e');
 
         Fluttertoast.showToast(
@@ -123,20 +106,13 @@ class _UdetailsState extends State<Udetails> {
           textColor: Colors.white,
           fontSize: 16.0,
         );
+      } finally {
+        setState(() {
+          _isLoading = false; // Hide the progress indicator
+        });
       }
     }
   }
-
-  // Future<String> uploadImage(String uid) async {
-  //   final storageRef = FirebaseStorage.instance.ref().child('user_images/$uid');
-  //   final uploadTask = storageRef.putFile(image!);
-  //   final snapshot = await uploadTask;
-  //   return await snapshot.ref.getDownloadURL();
-  // }
-
-  // Future<void> photoAdd() async{
-  //   if(image!=null){}
-  // }
 
   File? image;
   XFile? pick;
@@ -165,7 +141,6 @@ class _UdetailsState extends State<Udetails> {
                     child: Container(
                       width: screenWidth - 50,
                       height: screenHeight + 550,
-                      // decoration: BoxDecoration(border: Border.all()),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
@@ -195,7 +170,7 @@ class _UdetailsState extends State<Udetails> {
                           TextFormField(
                             controller: email,
                             validator: (value) {
-                              if(value!.isEmpty){
+                              if (value!.isEmpty) {
                                 return 'cannot be empty';
                               }
                               return null;
@@ -209,7 +184,6 @@ class _UdetailsState extends State<Udetails> {
                                 hintText: 'Enter your email'),
                           ),
                           SizedBox(height: 25),
-
                           Text(
                             'What is your name?',
                             style: TextStyle(
@@ -221,7 +195,7 @@ class _UdetailsState extends State<Udetails> {
                           TextFormField(
                             controller: name,
                             validator: (value) {
-                              if(value!.isEmpty){
+                              if (value!.isEmpty) {
                                 return 'cannot be empty';
                               }
                               return null;
@@ -235,7 +209,6 @@ class _UdetailsState extends State<Udetails> {
                                 hintText: 'Enter your name'),
                           ),
                           SizedBox(height: 25),
-
                           Text(
                             'Your phone number?',
                             style: TextStyle(
@@ -247,7 +220,7 @@ class _UdetailsState extends State<Udetails> {
                           TextFormField(
                             controller: number,
                             validator: (value) {
-                              if(value!.isEmpty){
+                              if (value!.isEmpty) {
                                 return 'cannot be empty';
                               }
                               return null;
@@ -261,7 +234,6 @@ class _UdetailsState extends State<Udetails> {
                                 hintText: 'Enter your phone number'),
                           ),
                           SizedBox(height: 25),
-
                           Text(
                             'What is your age?',
                             style: TextStyle(
@@ -273,7 +245,7 @@ class _UdetailsState extends State<Udetails> {
                           TextFormField(
                             controller: age,
                             validator: (value) {
-                              if(value!.isEmpty){
+                              if (value!.isEmpty) {
                                 return 'cannot be empty';
                               }
                               return null;
@@ -375,10 +347,7 @@ class _UdetailsState extends State<Udetails> {
                                         )
                                       : Image.asset(
                                           'assets/downloading.png',
-                                          
-                                        )
-                                  
-                                  ),
+                                        )),
                               SizedBox(
                                 width: 20,
                               ),
@@ -409,9 +378,7 @@ class _UdetailsState extends State<Udetails> {
                               )
                             ],
                           ),
-
-                          SizedBox(height: 25,),
-
+                          SizedBox(height: 25),
                           Text(
                             'Enter a password?',
                             style: TextStyle(
@@ -423,7 +390,7 @@ class _UdetailsState extends State<Udetails> {
                           TextFormField(
                             controller: password,
                             validator: (value) {
-                              if(value!.isEmpty){
+                              if (value!.isEmpty) {
                                 return 'cannot be empty';
                               }
                               return null;
@@ -437,24 +404,25 @@ class _UdetailsState extends State<Udetails> {
                                 hintText: 'Password'),
                           ),
                           SizedBox(height: 25),
-
                           SizedBox(
                             height: 60,
                           ),
                           Center(
-                            child: ElevatedButton(
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: Color(0xFFFACD18),
-                                ),
-                                onPressed: () async {
-                                  userAdding();
-                                },
-                                child: Text(
-                                  'Submit',
-                                  style: TextStyle(
-                                      fontWeight: FontWeight.w400,
-                                      color: Colors.black),
-                                )),
+                            child: _isLoading // Show CircularProgressIndicator if _isLoading is true
+                                ? CircularProgressIndicator()
+                                : ElevatedButton(
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: Color(0xFFFACD18),
+                                    ),
+                                    onPressed: () async {
+                                      userAdding();
+                                    },
+                                    child: Text(
+                                      'Submit',
+                                      style: TextStyle(
+                                          fontWeight: FontWeight.w400,
+                                          color: Colors.black),
+                                    )),
                           )
                         ],
                       ),
